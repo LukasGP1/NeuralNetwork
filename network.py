@@ -34,6 +34,8 @@ class NeuralNetwork:
         for i in range(self.layers - 1):
             self.layers_weights.append(numpy.random.normal(0.0, pow(layer_neuron_count[i], -0.5), (layer_neuron_count[i + 1], layer_neuron_count[i])))
         
+        self.layers_weights_copy = self.layers_weights.copy()
+
         parameters = 0
         for i in range(self.layers - 1):
             parameters += self.layer_neuron_count[i] * self.layer_neuron_count[i + 1]
@@ -101,7 +103,7 @@ class NeuralNetwork:
 
         #update weights with gradient descent
         for i in range(len(self.layers_weights)):
-            self.layers_weights[-i - 1] += self.alpha * numpy.dot((errors[i] * outputs[-i - 1] * (1 - outputs[-i - 1])), numpy.transpose(outputs[-i - 2]))
+            self.layers_weights_copy[-i - 1] += self.alpha * numpy.dot((errors[i] * outputs[-i - 1] * (1 - outputs[-i - 1])), numpy.transpose(outputs[-i - 2]))
     
     def train(self, inputs: List[List[float]], answers: List[List[float]], epochs: int):
         if len(inputs) != len(answers):
@@ -114,8 +116,9 @@ class NeuralNetwork:
                 input = inputs[i]
                 answer = answers[i]
                 self.trainOneExample(input, answer)
-                percentage = ((e * len(inputs) + i) / (epochs * len(inputs))) * 100
-                update_progress_bar(percentage)
+                #percentage = ((e * len(inputs) + i) / (epochs * len(inputs))) * 100
+                #update_progress_bar(percentage)
+            self.layers_weights = self.layers_weights_copy.copy()
         print()
     
     def saveWeights(self, filePath: str):
